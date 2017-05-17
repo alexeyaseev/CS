@@ -1,4 +1,4 @@
-// DuplicateFounder.cpp : Defines the entry point for the console application.
+// DupRemover.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -9,8 +9,9 @@
 #include <iostream>
 #include <set>
 #include <chrono>
+#include <numeric>
 
-// approach 1 (depends on hash function)
+// approach 1
 std::hash<int> IntHasher;
 size_t GetModuloHash(int value, size_t size, size_t offset)
 {
@@ -97,10 +98,10 @@ void DupRemover2(std::vector<int>& data)
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	for (int MAXVALUE = 1000000; MAXVALUE < 10000000 * 1000; MAXVALUE *= 1.5)
-	{
+	//for (int MAXVALUE = 500000; MAXVALUE < 10000000 * 100; MAXVALUE *= 1.5)
+	//{
 		const int N = 10000000;
-		//const int MAXVALUE = 3000000;
+		const int MAXVALUE = 1*N;
 		std::vector<int> data(N);
 		//std::vector<int> data({ 2, 3, 6, 4, 4, 1, 7 });
 
@@ -110,7 +111,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::uniform_int_distribution<int> dist(1, MAXVALUE);
 		auto gen = std::bind(dist, eng);
 		std::generate(begin(data), end(data), gen);
-
+		
 		std::vector<int> datacopy(data);
 
 		// run algorithms
@@ -124,6 +125,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		stop = std::chrono::steady_clock::now();
 		int time2 = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
 
+		//std::cout << (std::set<int>(datacopy.begin(), datacopy.end()) == std::set<int>(data.begin(), data.end()));
+
 		std::cout << "Algorithm 1: " << time1 << " ms" << std::endl;
 		std::cout << "Algorithm 2: " << time2 << " ms" << std::endl;
 		double dupfactor = 100.0 * (N - data.size()) / N;
@@ -131,7 +134,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		std::cout << "Number of duplicates: " << dupfactor << "%" << std::endl;
 		double speedup = (double)time2 / time1;
 		std::cout << "Speedup: " << speedup << std::endl;
-	}
+		//std::cout << dupfactor << " " << speedup << std::endl;
+	//}
 	return 0;
 }
 
