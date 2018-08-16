@@ -2,15 +2,22 @@
 Steinhaus–Johnson–Trotter algorithm for generating permutations
 by swapping only adjacent items
 
-15 august 2018
-size: <40>, time <0.34>
-size: <80>, time <0.39>
-size: <800>, time <0.88>
+16 august 2018
+algorithm
+size: <40,1000000>, time <1.39>
+size: <80,1000000>, time <1.52>
+size: <8000,50000>, time <1.41>
+size: <800000,100>, time <1.08>
+
+itertools.permutations
+size: <40,1000000>, time <0.36>
+size: <80,1000000>, time <0.50>
+size: <8000,50000>, time <1.39>
+size: <800000,100>, time <1.18>
 """
 
 
-
-def Permutation(n):
+def Permutation0(n):
     P  = list(range(n+1)) #last item is sentinel
     Pi = list(range(n))
     d  = [-1] * (n)
@@ -27,17 +34,27 @@ def Permutation(n):
         active.extend(range(m+1,n))
     yield P[:-1]
 
+def Permutation1(n):
+    from itertools import permutations
+    for p in permutations(range(n)):
+        yield p
+
+
 if __name__ == "__main__":
     import time
-    tests = ((40,300000),(80,300000),(800,300000))
+    tests = ((40,1000000),(80,1000000),(8000,50000),(800000,100))
     for size,maxn in tests:
-        Sol = Permutation(size)
-        temp = next(Sol)
-        start = time.time()
-        counter = 0
-        for p in Sol:
-            #print(p)
-            counter += 1
-            if counter == maxn: break
-        stop = time.time()
-        print("size: <{}>, time <{:.2f}>".format(size, stop - start))
+        times = []
+        for runs in range(5):
+            Sol = Permutation0(size)
+            temp = next(Sol)
+            start = time.time()
+            counter = 0
+            for p in Sol:
+                #print(p)
+                counter += 1
+                if counter == maxn: break
+            stop = time.time()
+            times.append(stop - start)
+        _time = sum(times) / len(times)
+        print("size: <{},{}>, time <{:.2f}>".format(size, maxn, _time))
